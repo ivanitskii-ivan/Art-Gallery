@@ -954,8 +954,8 @@ function () {
     key: "makeContainer",
     value: function makeContainer() {
       this.btn.forEach(function (item) {
-        var container = document.createElement('div');
-        container.classList.add('cont');
+        var container = document.createElement("div");
+        container.classList.add("cont");
         item.append(container);
       });
     }
@@ -964,9 +964,9 @@ function () {
     value: function mouseMove() {
       this.makeContainer();
       this.btn.forEach(function (item) {
-        item.addEventListener('mousemove', function (e) {
-          var span = document.createElement('span');
-          span.classList.add('circle');
+        item.addEventListener("mousemove", function (e) {
+          var span = document.createElement("span");
+          span.classList.add("circle");
           var offset = e.target.getBoundingClientRect();
           var x = e.clientX - offset.left;
           var y = e.clientY - offset.top;
@@ -975,7 +975,7 @@ function () {
           item.lastChild.append(span);
           var timeDelete = setInterval(function () {
             span.remove();
-          }, 1000);
+          }, 200);
         });
       });
     }
@@ -985,6 +985,94 @@ function () {
 }();
 
 
+
+/***/ }),
+
+/***/ "./src/assets/modules/burger.js":
+/*!**************************************!*\
+  !*** ./src/assets/modules/burger.js ***!
+  \**************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var burger = function burger(_burger, classActive) {
+  var burgerBtn = document.querySelector(_burger),
+      burgerClass = document.querySelector(classActive);
+  var windowWidth = window.innerWidth;
+
+  if (windowWidth <= 991) {
+    burgerBtn.addEventListener("click", function (e) {
+      return toggleBurger(e);
+    });
+  }
+
+  function toggleBurger(e) {
+    if (e.target) {
+      if (burgerClass.className !== "burger-menu burger-active") {
+        console.log("burger-active");
+        burgerClass.classList.add("burger-active");
+        burgerBtn.classList.add("burger-active");
+      } else {
+        burgerClass.classList.remove("burger-active");
+        burgerBtn.classList.remove("burger-active");
+      }
+    }
+  }
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (burger);
+
+/***/ }),
+
+/***/ "./src/assets/modules/buttons.js":
+/*!***************************************!*\
+  !*** ./src/assets/modules/buttons.js ***!
+  \***************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
+/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_0__);
+
+
+var btn = function btn(btns, elements, wrapper) {
+  var button = document.querySelectorAll(btns);
+  var element = document.querySelectorAll(elements);
+  var wrapperElem = document.querySelector(wrapper);
+  button.forEach(function (btn, i) {
+    btn.addEventListener("click", function (e) {
+      if (e.target) {
+        removeClassActive();
+        btn.classList.add("active");
+        changeElement(button[i].classList[0]);
+      }
+    });
+  });
+
+  function changeElement(btn) {
+    console.log(btn);
+    element.forEach(function (item, i) {
+      if (item.className.indexOf(btn) > -1) {
+        item.style.display = "block";
+        wrapperElem.style.justifyContent = "center";
+      } else {
+        item.style.display = " none";
+      }
+    });
+  }
+
+  function removeClassActive() {
+    button.forEach(function (btn) {
+      return btn.classList.remove("active");
+    });
+  }
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (btn);
 
 /***/ }),
 
@@ -1080,14 +1168,14 @@ var modals = function modals() {
     var open = document.querySelectorAll(triggerModalOpen),
         modal = document.querySelector(triggerModal),
         close = document.querySelector(triggerModalClose),
-        window = document.querySelectorAll('[data-modal]'),
+        window = document.querySelectorAll("[data-modal]"),
         scroll = scrollHide();
     window.forEach(function (item) {
-      item.classList.add('animated', 'fadeIn');
+      item.classList.add("animated", "fadeIn");
     });
     open.forEach(function (item) {
       // open Modal - btn
-      item.addEventListener('click', function (e) {
+      item.addEventListener("click", function (e) {
         modalValueBtn = true;
 
         if (present) {
@@ -1096,32 +1184,32 @@ var modals = function modals() {
         }
 
         window.forEach(function (item) {
-          // close all modal 
-          item.style.display = 'none';
+          // close all modal
+          item.style.display = "none";
         });
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
+        modal.style.display = "block";
+        document.body.style.overflow = "hidden";
         document.body.style.marginRight = "".concat(scroll, "px"); // show modal
         // document.body.classList.add('modal-open');
       });
-      close.addEventListener('click', function () {
+      close.addEventListener("click", function () {
         //  this functinon close modal  after click btn_close
         window.forEach(function (item) {
-          item.style.display = 'none';
+          item.style.display = "none";
         });
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
+        modal.style.display = "none";
+        document.body.style.overflow = "";
         document.body.style.marginRight = "0px"; // document.body.classList.remove('modal-open');
       });
     });
-    modal.addEventListener('click', function (e) {
+    modal.addEventListener("click", function (e) {
       if (e.target === modal) {
         window.forEach(function (item) {
-          item.style.display = 'none';
+          item.style.display = "none";
         });
-        modal.style.display = 'none'; // document.body.classList.remove('modal-open');
+        modal.style.display = "none"; // document.body.classList.remove('modal-open');
 
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
         document.body.style.marginRight = "0px";
       }
     });
@@ -1129,16 +1217,16 @@ var modals = function modals() {
 
   function timeModal(selector, time) {
     setTimeout(function () {
-      var modalActive = document.querySelectorAll('[data-modal]');
+      var modalActive = document.querySelectorAll("[data-modal]");
       var display = false;
       modalActive.forEach(function (item) {
-        if (getComputedStyle(item).display == 'block' || modalValueBtn == true) {
+        if (getComputedStyle(item).display == "block" || modalValueBtn == true) {
           display = true;
           clearInterval(setTimeout);
         } else if (display == false) {
           modalValueBtn = true;
-          document.querySelector(selector).style.display = 'block';
-          document.body.style.overflow = 'hidden';
+          document.querySelector(selector).style.display = "block";
+          document.body.style.overflow = "hidden";
           var scrolling = scrollHide();
         }
       });
@@ -1146,11 +1234,11 @@ var modals = function modals() {
   }
 
   function scrollHide() {
-    var div = document.createElement('div');
-    div.style.width = '100px';
-    div.style.height = '100px';
-    div.style.overflowY = 'scroll';
-    div.style.visibility = 'hidden';
+    var div = document.createElement("div");
+    div.style.width = "100px";
+    div.style.height = "100px";
+    div.style.overflowY = "scroll";
+    div.style.visibility = "hidden";
     document.body.appendChild(div);
     var scroll = div.offsetWidth - div.clientWidth;
     div.remove();
@@ -1158,24 +1246,24 @@ var modals = function modals() {
   }
 
   function scrollPageYOffset(selector, present) {
-    window.addEventListener('scroll', function () {
+    window.addEventListener("scroll", function () {
       var height = window.scrollY + document.documentElement.clientHeight + 5;
       var scroll = Math.max(document.documentElement.clientHeight, document.body.offsetHeight);
       console.log(height, scroll);
 
       if (!modalValueBtn && height >= scroll) {
         modalValueBtn = true;
-        document.querySelector(selector).style.display = 'block';
+        document.querySelector(selector).style.display = "block";
         document.querySelector(present).remove();
       }
     });
   }
 
-  timeModal('.popup-consultation  ', 6000);
-  modal('.button-design', '.popup-design', '.popup-design .popup-close');
-  modal('.button-consultation  ', '.popup-consultation  ', '.popup-consultation  .popup-close');
-  modal('.fixed-gift', '.popup-gift', '.popup-gift .popup-close', true);
-  scrollPageYOffset('.popup-gift', '.fixed-gift');
+  timeModal(".popup-consultation  ", 30000);
+  modal(".button-design", ".popup-design", ".popup-design .popup-close");
+  modal(".button-consultation  ", ".popup-consultation  ", ".popup-consultation  .popup-close");
+  modal(".fixed-gift", ".popup-gift", ".popup-gift .popup-close", true);
+  scrollPageYOffset(".popup-gift", ".fixed-gift");
 };
 
 /***/ }),
@@ -1198,7 +1286,7 @@ var slider = function slider(selector, position, btnN, btnPr, time) {
   var indexSlide = 0;
   var stop = false;
   var slide = document.querySelectorAll(selector);
-  var feedback = document.querySelector('.feedback');
+  var feedback = document.querySelector(".feedback");
 
   function showSlide(n) {
     if (n > slide.length - 1) {
@@ -1210,10 +1298,10 @@ var slider = function slider(selector, position, btnN, btnPr, time) {
     }
 
     slide.forEach(function (item) {
-      item.style.display = 'none';
+      item.style.display = "none";
     });
-    feedback.style.overflow = 'hidden';
-    slide[indexSlide].style.display = 'block';
+    feedback.style.overflow = "hidden";
+    slide[indexSlide].style.display = "block";
   }
 
   showSlide(0);
@@ -1226,41 +1314,41 @@ var slider = function slider(selector, position, btnN, btnPr, time) {
     try {
       var btnNext = document.querySelector(btnN),
           btnPrev = document.querySelector(btnPr);
-      btnNext.addEventListener('click', function (e) {
+      btnNext.addEventListener("click", function (e) {
         if (e.target) {
           plusSlide(1);
-          slide[indexSlide].classList.add('animated', 'fadeInRight');
-          slide[indexSlide].classList.remove('fadeInLeft');
+          slide[indexSlide].classList.add("animated", "fadeInRight");
+          slide[indexSlide].classList.remove("fadeInLeft");
         }
       });
-      btnPrev.addEventListener('click', function (e) {
+      btnPrev.addEventListener("click", function (e) {
         if (e.target) {
           plusSlide(-1);
-          slide[indexSlide].classList.add('animated', 'fadeInLeft');
-          slide[indexSlide].classList.remove('fadeInRight');
+          slide[indexSlide].classList.add("animated", "fadeInLeft");
+          slide[indexSlide].classList.remove("fadeInRight");
         }
       });
     } catch (e) {}
   }
 
   function activeAnimation() {
-    if (position == 'vertical') {
+    if (position == "vertical") {
       stop = setInterval(function () {
         plusSlide(1);
-        slide[indexSlide].classList.add('animated', 'fadeInDown');
-      }, 3000);
+        slide[indexSlide].classList.add("animated", "fadeInDown");
+      }, time);
     } else {
       stop = setInterval(function () {
         plusSlide(1);
-        slide[indexSlide].classList.add('animated', 'fadeInRight');
+        slide[indexSlide].classList.add("animated", "fadeInRight");
       }, time);
     }
   }
 
-  slide[0].parentNode.addEventListener('mouseover', function () {
+  slide[0].parentNode.addEventListener("mouseover", function () {
     clearInterval(stop);
   });
-  slide[0].parentNode.addEventListener('mouseout', function () {
+  slide[0].parentNode.addEventListener("mouseout", function () {
     activeAnimation();
   });
   activeAnimation();
@@ -1284,18 +1372,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _assets_modules_slider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../assets/modules/slider */ "./src/assets/modules/slider.js");
 /* harmony import */ var _assets_modules_animateButton__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../assets/modules/animateButton */ "./src/assets/modules/animateButton.js");
 /* harmony import */ var _assets_modules_form__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../assets/modules/form */ "./src/assets/modules/form.js");
+/* harmony import */ var _assets_modules_burger__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../assets/modules/burger */ "./src/assets/modules/burger.js");
+/* harmony import */ var _assets_modules_buttons__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../assets/modules/buttons */ "./src/assets/modules/buttons.js");
 
 
 
 
-window.addEventListener('DOMContentLoaded', function () {
-  'use strict';
 
+
+window.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+
+  Object(_assets_modules_buttons__WEBPACK_IMPORTED_MODULE_5__["default"])(".portfolio-menu>li", ".portfolio-block ", ".portfolio-wrapper");
+  Object(_assets_modules_burger__WEBPACK_IMPORTED_MODULE_4__["default"])(".burger", ".burger-menu");
   Object(_assets_modules_modals__WEBPACK_IMPORTED_MODULE_0__["modals"])();
   Object(_assets_modules_form__WEBPACK_IMPORTED_MODULE_3__["form"])();
-  Object(_assets_modules_slider__WEBPACK_IMPORTED_MODULE_1__["slider"])('.feedback-slider-item', "horizontal", '.main-next-btn', '.main-prev-btn', 3000);
-  Object(_assets_modules_slider__WEBPACK_IMPORTED_MODULE_1__["slider"])('.main-slider-item', 'vertical', "", "", 3000);
-  var animate = new _assets_modules_animateButton__WEBPACK_IMPORTED_MODULE_2__["AnimateBtn"]('.button-order');
+  Object(_assets_modules_slider__WEBPACK_IMPORTED_MODULE_1__["slider"])(".feedback-slider-item", "horizontal", ".main-next-btn", ".main-prev-btn", 6000);
+  Object(_assets_modules_slider__WEBPACK_IMPORTED_MODULE_1__["slider"])(".main-slider-item", "vertical", "", "", 3000);
+  var animate = new _assets_modules_animateButton__WEBPACK_IMPORTED_MODULE_2__["AnimateBtn"](".button-order");
   animate.mouseMove();
 });
 

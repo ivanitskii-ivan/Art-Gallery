@@ -130,6 +130,11 @@ h4 {
   position: relative;
   top: -2px;
 }
+
+.header .burger img:nth-child(2){
+  display: none;
+} 
+
 .header-menu {
   padding: 0;
   margin: 0;
@@ -371,6 +376,11 @@ h4 {
   z-index: 10;
   background-color: transparent;
 }
+
+.main-slider-item img{
+  width: 100%;
+}
+
 .main-slider-btn img {
   width: 100%;
 }
@@ -1384,6 +1394,18 @@ h4 {
   .header .burger {
     cursor: pointer;
   }
+
+  .header .burger-menu.burger-active {
+    display: block;
+    position: absolute;
+    background-color: #fff;
+    z-index: 10;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 20rem;
+  }
+
   .header .burger span {
     display: none;
   }
@@ -1488,6 +1510,25 @@ h4 {
     margin: 4rem auto;
     width: auto;
   }
+
+  .header .burger img{
+    transition: 0.5s all;
+  }
+
+  .header .burger img:nth-child(2){
+    display: block;
+    position: absolute;
+    transform: translateY(100%) translateX(200%);
+    transition: 0.5s all;
+  }
+  .header .burger.burger-active img{
+    transform:  translateX(-300%);
+  }
+  .header .burger.burger-active img:nth-child(2){
+    transform: translateY(100%) translateX(0);
+  }
+
+
 }
 @media (max-width: 767px) {
   .main-features {
