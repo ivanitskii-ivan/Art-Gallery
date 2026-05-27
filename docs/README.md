@@ -8,7 +8,7 @@
 
 ##  Демо
 
-👉 https://your-demo-link.com  
+👉https://ivanitskii-ivan.github.io/Art-Gallery/
 
 
 ##  Технологии
