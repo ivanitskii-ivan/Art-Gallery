@@ -1,34 +1,43 @@
-class AnimateBtn {
-  constructor(btn) {
-    this.btn = document.querySelectorAll(btn);
+const animateBtn = (btn) => {
+  const buttons = document.querySelectorAll(btn);
+
+  if (!buttons.length) {
+    return;
   }
 
-  makeContainer() {
-    this.btn.forEach((item) => {
-      const container = document.createElement("div");
-      container.classList.add("cont");
-      item.append(container);
+  const createContainer = (button) => {
+    let container = button.querySelector('.cont');
+
+    if (!container) {
+      container = document.createElement('div');
+      container.classList.add('cont');
+      button.append(container);
+    }
+
+    return container;
+  };
+
+  buttons.forEach((button) => {
+    createContainer(button);
+
+    button.addEventListener('click', (e) => {
+      const container = createContainer(button);
+      const circle = document.createElement('span');
+      const rect = button.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      circle.classList.add('circle');
+      circle.style.left = `${x}px`;
+      circle.style.top = `${y}px`;
+
+      container.append(circle);
+
+      setTimeout(() => {
+        circle.remove();
+      }, 200);
     });
-  }
+  });
+};
 
-  mouseMove() {
-    this.makeContainer();
-    this.btn.forEach((item) => {
-      item.addEventListener("mousemove", function (e) {
-        const span = document.createElement("span");
-        span.classList.add("circle");
-        const offset = e.target.getBoundingClientRect();
-        const x = e.clientX - offset.left;
-        const y = e.clientY - offset.top;
-        span.style.left = `${x}px`;
-        span.style.top = `${y}px`;
-        item.lastChild.append(span);
-        const timeDelete = setInterval(() => {
-          span.remove();
-        }, 200);
-      });
-    });
-  }
-}
-
-export { AnimateBtn };
+export default animateBtn;

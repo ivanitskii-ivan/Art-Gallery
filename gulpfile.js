@@ -6,7 +6,7 @@ const browsersync = require("browser-sync");
 
 // const dist = "./dist/";
 
-const dist = "D:/Projects/ArtProject/Source/build";
+const dist = "D:/Мои Готовые проекты/Html Js/ArtProject/build";
 
 gulp.task("copy-html", () => {
   return gulp
@@ -17,12 +17,12 @@ gulp.task("copy-html", () => {
 
 gulp.task("build-js", () => {
   return gulp
-    .src("./src/js/main.js")
+    .src("./src/**/*.js")
     .pipe(
       webpack({
         mode: "development",
         output: {
-          filename: "script.js",
+          filename: "js/main.js",
         },
         watch: false,
         devtool: "source-map",
@@ -75,41 +75,5 @@ gulp.task("watch", () => {
 });
 
 gulp.task("build", gulp.parallel("copy-html", "copy-assets", "build-js"));
-
-gulp.task("build-prod-js", () => {
-  return gulp
-    .src("./src/js/main.js")
-    .pipe(
-      webpack({
-        mode: "production",
-        output: {
-          filename: "script.js",
-        },
-        module: {
-          rules: [
-            {
-              test: /\.m?js$/,
-              exclude: /(node_modules|bower_components)/,
-              use: {
-                loader: "babel-loader",
-                options: {
-                  presets: [
-                    [
-                      "@babel/preset-env",
-                      {
-                        corejs: 3,
-                        useBuiltIns: "usage",
-                      },
-                    ],
-                  ],
-                },
-              },
-            },
-          ],
-        },
-      })
-    )
-    .pipe(gulp.dest(dist));
-});
 
 gulp.task("default", gulp.parallel("watch", "build"));

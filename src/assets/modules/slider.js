@@ -1,76 +1,88 @@
-const slider = (selector, position, btnN, btnPr, time) => {
-  let indexSlide = 0;
-  let stop = false;
-  const slide = document.querySelectorAll(selector);
-  const feedback = document.querySelector(".feedback");
+const slider = (selector, position, btnN, btnPr, time = 3000) => {
+  const slides = document.querySelectorAll(selector);
 
-  function showSlide(n) {
-    if (n > slide.length - 1) {
-      indexSlide = 0;
-    }
-
-    if (n < 0) {
-      indexSlide = slide.length - 1;
-    }
-
-    slide.forEach((item) => {
-      item.style.display = "none";
-    });
-    feedback.style.overflow = "hidden";
-    slide[indexSlide].style.display = "block";
+  if (!slides.length) {
+    return;
   }
+
+  const sliderContainer = slides[0].parentElement;
+  const btnNext = document.querySelector(btnN);
+  const btnPrev = document.querySelector(btnPr);
+
+  let indexSlide = 0;
+  let autoplayId = null;
+
+  const hideAllSlides = () => {
+    slides.forEach((slide) => {
+      slide.style.display = 'none';
+      slide.classList.remove('fadeInRight', 'fadeInLeft', 'fadeInDown');
+    });
+  };
+
+  const normalizeIndex = (index) => {
+    if (index >= slides.length) {
+      return 0;
+    }
+
+    if (index < 0) {
+      return slides.length - 1;
+    }
+
+    return index;
+  };
+
+  const showSlide = (index, animationClass = 'fadeInDown') => {
+    indexSlide = normalizeIndex(index);
+    hideAllSlides();
+    slides[indexSlide].style.display = 'block';
+    slides[indexSlide].classList.add('animated', animationClass);
+  };
+
+  const plusSlide = (step, animationClass) => {
+    showSlide(indexSlide + step, animationClass);
+  };
+
+  const stopAutoplay = () => {
+    if (!autoplayId) {
+      return;
+    }
+
+    clearInterval(autoplayId);
+    autoplayId = null;
+  };
+
+  const startAutoplay = () => {
+    stopAutoplay();
+
+    const animationClass = position === 'vertical' ? 'fadeInDown' : 'fadeInRight';
+
+    autoplayId = setInterval(() => {
+      plusSlide(1, animationClass);
+    }, time);
+  };
+
+  const handleManualSlide = (step, animationClass) => {
+    plusSlide(step, animationClass);
+    startAutoplay();
+  };
+
+  if (btnNext) {
+    btnNext.addEventListener('click', () => {
+      handleManualSlide(1, 'fadeInRight');
+    });
+  }
+
+  if (btnPrev) {
+    btnPrev.addEventListener('click', () => {
+      handleManualSlide(-1, 'fadeInLeft');
+    });
+  }
+
+  sliderContainer.addEventListener('mouseenter', stopAutoplay);
+  sliderContainer.addEventListener('mouseleave', startAutoplay);
 
   showSlide(0);
-
-  function plusSlide(n) {
-    showSlide((indexSlide += n));
-  }
-
-  function toggleBtn() {
-    try {
-      const btnNext = document.querySelector(btnN),
-        btnPrev = document.querySelector(btnPr);
-      btnNext.addEventListener("click", (e) => {
-        if (e.target) {
-          plusSlide(1);
-          slide[indexSlide].classList.add("animated", "fadeInRight");
-          slide[indexSlide].classList.remove("fadeInLeft");
-        }
-      });
-
-      btnPrev.addEventListener("click", (e) => {
-        if (e.target) {
-          plusSlide(-1);
-          slide[indexSlide].classList.add("animated", "fadeInLeft");
-          slide[indexSlide].classList.remove("fadeInRight");
-        }
-      });
-    } catch (e) {}
-  }
-
-  function activeAnimation() {
-    if (position == "vertical") {
-      stop = setInterval(() => {
-        plusSlide(1);
-        slide[indexSlide].classList.add("animated", "fadeInDown");
-      }, time);
-    } else {
-      stop = setInterval(() => {
-        plusSlide(1);
-        slide[indexSlide].classList.add("animated", "fadeInRight");
-      }, time);
-    }
-  }
-
-  slide[0].parentNode.addEventListener("mouseover", () => {
-    clearInterval(stop);
-  });
-  slide[0].parentNode.addEventListener("mouseout", () => {
-    activeAnimation();
-  });
-
-  activeAnimation();
-  toggleBtn();
+  startAutoplay();
 };
 
-export { slider };
+export default slider;

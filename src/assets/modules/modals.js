@@ -1,118 +1,158 @@
 export { modals };
+
 const modals = () => {
-  let modalValueBtn = false;
-  function modal(triggerModalOpen, triggerModal, triggerModalClose, present) {
-    const open = document.querySelectorAll(triggerModalOpen),
-      modal = document.querySelector(triggerModal),
-      close = document.querySelector(triggerModalClose),
-      window = document.querySelectorAll("[data-modal]"),
-      scroll = scrollHide();
+  let modalOpenedByUser = false;
+  let lastActiveElement = null;
 
-    window.forEach((item) => {
-      item.classList.add("animated", "fadeIn");
-    });
+  const allModals = document.querySelectorAll('[data-modal]');
+  const bodyScrollWidth = getScrollBarWidth();
 
-    open.forEach((item) => {
-      // open Modal - btn
-      item.addEventListener("click", (e) => {
-        modalValueBtn = true;
-        if (present) {
-          console.log(item.className);
-          item.remove();
-        }
-        window.forEach((item) => {
-          // close all modal
-          item.style.display = "none";
-        });
-        modal.style.display = "block";
-        document.body.style.overflow = "hidden";
-        document.body.style.marginRight = `${scroll}px`; // show modal
-        // document.body.classList.add('modal-open');
-      });
+  if (!allModals.length) {
+    return;
+  }
 
-      close.addEventListener("click", () => {
-        //  this functinon close modal  after click btn_close
-        window.forEach((item) => {
-          item.style.display = "none";
-        });
-        modal.style.display = "none";
-        document.body.style.overflow = "";
-        document.body.style.marginRight = `0px`;
-        // document.body.classList.remove('modal-open');
-      });
-    });
+  allModals.forEach((modal) => {
+    modal.classList.add('animated', 'fadeIn');
 
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        window.forEach((item) => {
-          item.style.display = "none";
-        });
-
-        modal.style.display = "none";
-        // document.body.classList.remove('modal-open');
-        document.body.style.overflow = "";
-        document.body.style.marginRight = `0px`;
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        closeAllModals();
       }
     });
-  }
-  function timeModal(selector, time) {
-    setTimeout(() => {
-      const modalActive = document.querySelectorAll("[data-modal]");
-      let display = false;
+  });
 
-      modalActive.forEach((item) => {
-        if (
-          getComputedStyle(item).display == "block" ||
-          modalValueBtn == true
-        ) {
-          display = true;
-          clearInterval(setTimeout);
-        } else if (display == false) {
-          modalValueBtn = true;
-          document.querySelector(selector).style.display = "block";
-          document.body.style.overflow = "hidden";
-          let scrolling = scrollHide();
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && isAnyModalOpen()) {
+      closeAllModals();
+    }
+  });
+
+  bindModal('.button-design', '.popup-design', '.popup-design .popup-close');
+  bindModal(
+    '.button-consultation',
+    '.popup-consultation',
+    '.popup-consultation .popup-close'
+  );
+  bindModal('.fixed-gift', '.popup-gift', '.popup-gift .popup-close', {
+    removeTrigger: true,
+  });
+
+  openModalByTime('.popup-consultation', 30000);
+  openModalOnScrollBottom('.popup-gift', '.fixed-gift');
+
+  function bindModal(openSelector, modalSelector, closeSelector, options = {}) {
+    const openButtons = document.querySelectorAll(openSelector);
+    const modal = document.querySelector(modalSelector);
+    const closeButton = document.querySelector(closeSelector);
+
+    if (!openButtons.length || !modal || !closeButton) {
+      return;
+    }
+
+    openButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        modalOpenedByUser = true;
+        lastActiveElement = button;
+
+        if (options.removeTrigger) {
+          button.remove();
         }
+
+        openModal(modal);
       });
-    }, time);
+    });
+
+    closeButton.addEventListener('click', closeAllModals);
   }
 
-  function scrollHide() {
-    let div = document.createElement("div");
-    div.style.width = "100px";
-    div.style.height = "100px";
-    div.style.overflowY = "scroll";
-    div.style.visibility = "hidden";
+  function openModal(modal) {
+    closeAllModals(false);
+
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    document.body.style.marginRight = `${bodyScrollWidth}px`;
+
+    const focusTarget = modal.querySelector(
+      'input, textarea, select, button, [href], [tabindex]:not([tabindex="-1"])'
+    );
+
+    if (focusTarget) {
+      focusTarget.focus();
+    }
+  }
+
+  function closeAllModals(resetModalFlag = false) {
+    allModals.forEach((modal) => {
+      modal.style.display = 'none';
+    });
+
+    document.body.style.overflow = '';
+    document.body.style.marginRight = '0px';
+
+    if (lastActiveElement && typeof lastActiveElement.focus === 'function') {
+      lastActiveElement.focus();
+    }
+
+    if (resetModalFlag) {
+      modalOpenedByUser = false;
+    }
+  }
+
+  function openModalByTime(selector, delay) {
+    setTimeout(() => {
+      const modal = document.querySelector(selector);
+
+      if (!modal || modalOpenedByUser || isAnyModalOpen()) {
+        return;
+      }
+
+      modalOpenedByUser = true;
+      openModal(modal);
+    }, delay);
+  }
+
+  function openModalOnScrollBottom(modalSelector, triggerSelector) {
+    const onScroll = () => {
+      const scrollPosition =
+        window.scrollY + document.documentElement.clientHeight;
+      const pageHeight = document.documentElement.scrollHeight;
+      const modal = document.querySelector(modalSelector);
+      const trigger = document.querySelector(triggerSelector);
+
+      if (!modal || !trigger || modalOpenedByUser) {
+        return;
+      }
+
+      if (scrollPosition >= pageHeight - 5) {
+        modalOpenedByUser = true;
+        trigger.remove();
+        openModal(modal);
+        window.removeEventListener('scroll', onScroll);
+      }
+    };
+
+    window.addEventListener('scroll', onScroll);
+  }
+
+  function isAnyModalOpen() {
+    return Array.from(allModals).some((modal) => {
+      return getComputedStyle(modal).display === 'block';
+    });
+  }
+
+  function getScrollBarWidth() {
+    const div = document.createElement('div');
+    div.style.width = '100px';
+    div.style.height = '100px';
+    div.style.overflowY = 'scroll';
+    div.style.visibility = 'hidden';
 
     document.body.appendChild(div);
-    let scroll = div.offsetWidth - div.clientWidth;
+    const scrollWidth = div.offsetWidth - div.clientWidth;
     div.remove();
-    return scroll;
-  }
 
-  function scrollPageYOffset(selector, present) {
-    window.addEventListener("scroll", () => {
-      const height = window.scrollY + document.documentElement.clientHeight + 5;
-      const scroll = Math.max(
-        document.documentElement.clientHeight,
-        document.body.offsetHeight
-      );
-      console.log(height, scroll);
-      if (!modalValueBtn && height >= scroll) {
-        modalValueBtn = true;
-        document.querySelector(selector).style.display = "block";
-        document.querySelector(present).remove();
-      }
-    });
+    return scrollWidth;
   }
-
-  timeModal(".popup-consultation  ", 30000);
-  modal(".button-design", ".popup-design", ".popup-design .popup-close");
-  modal(
-    ".button-consultation  ",
-    ".popup-consultation  ",
-    ".popup-consultation  .popup-close"
-  );
-  modal(".fixed-gift", ".popup-gift", ".popup-gift .popup-close", true);
-  scrollPageYOffset(".popup-gift", ".fixed-gift");
 };
+
+export default modals;

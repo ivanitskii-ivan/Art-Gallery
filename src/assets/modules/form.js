@@ -1,76 +1,124 @@
-export{form}
+import apiPost from '../servese/api.js';
+import clearInputForm from './clearInput.js';
+import formatText from './formatText.js';
+import validate from './validate.js';
 
+const form = (state) => {
+  const price = document.querySelector('.calc-price');
+  const forms = document.querySelectorAll('form');
+  const uploads = document.querySelectorAll('[name="upload"]');
+  const buttons = document.querySelectorAll('button');
 
-const form = () => {
-    const btnConsultation = document.querySelectorAll('.button-consultation')
+  const messages = {
+    loading: 'Загрузка...',
+    spinner: 'assets/img/spinner.gif',
+    successImg: 'assets/img/ok.png',
+    success: 'Готово',
+    errorImg: 'assets/img/fail.png',
+    error: 'Что-то пошло не так',
+  };
 
-    const form = document.querySelectorAll('form')
-    const input = document.querySelectorAll('input');
+  if (!forms.length) {
+    return;
+  }
 
- 
+  const toggleButtonsDisabled = (isDisabled) => {
+    buttons.forEach((button) => {
+      if (isDisabled) {
+        button.setAttribute('disabled', 'disabled');
+      } else {
+        button.removeAttribute('disabled');
+      }
+    });
+  };
 
-    console.log(form, input)
+  uploads.forEach((input) => {
+    input.addEventListener('input', (event) => {
+      const fileNameLabel = event.target.parentElement?.children?.[1];
+      const file = event.target.files?.[0];
 
-    const messages = {
-        load: 'Загрузка',
-        succesful: 'Готово',
-        false: 'Ошибка'
-    }
+      if (!fileNameLabel) {
+        return;
+      }
 
-    
-    // async function postData(url,data){
-    //  let res = await fetch(url,{
-    //     method : 'POST',
-    //     headers : {'Content-type':'application/json'},
-    //     body: JSON.stringify(data)
-    //  })
-    //  return await res.json()
-    // }
+      fileNameLabel.textContent = file ? formatText(file.name) : 'Файл не выбран';
+    });
+  });
 
+  forms.forEach((currentForm) => {
+    currentForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
 
-    form.forEach(item => {
-        post(item)
-    })
+      if (!validate(currentForm)) {
+        return;
+      }
 
+      const currentInputs = currentForm.querySelectorAll('input');
+      const currentTextAreas = currentForm.querySelectorAll('textarea');
+      const currentUploads = currentForm.querySelectorAll('[name="upload"]');
+      const currentSelects = currentForm.querySelectorAll('select');
+      const statusImage = document.createElement('img');
+      const statusMessage = document.createElement('div');
 
-   function post(form){
-    form.addEventListener('submit', (e) =>{
-        e.preventDefault()
-        console.log(e)
+      currentForm.classList.add('animated', 'fadeOut');
+      toggleButtonsDisabled(true);
 
-        const statusMessages = document.createElement('div');
-              statusMessages.classList.add('messages');
-              statusMessages.innerHTML = messages.load;
-              statusMessages.style.cssText =`margin-top:10px;` 
-              form.insertAdjacentElement('afterend',statusMessages);
+      statusImage.classList.add('spinner', 'animated', 'fadeIn');
+      statusImage.src = messages.spinner;
 
-        const request = new XMLHttpRequest();
-        request.open('POST','server.php')
+      statusMessage.classList.add('messages');
+      statusMessage.textContent = messages.loading;
+      statusMessage.style.cssText = `
+        margin-top: 10px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #ba1eb8;
+        text-align: center;
+      `;
 
-        const formData = new FormData(form)
-    
-        request.send(formData)
+      setTimeout(() => {
+        currentForm.style.display = 'none';
+        currentForm.classList.remove('animated', 'fadeOut');
+        currentForm.insertAdjacentElement('afterend', statusImage);
+        statusImage.insertAdjacentElement('afterend', statusMessage);
+      }, 300);
 
+      const formData = new FormData(currentForm);
 
-        request.addEventListener('load',()=>{
-            if(request.status == 200){
-                statusMessages.innerHTML = messages.succesful
-                form.reset()
+      Object.keys(state).forEach((key) => {
+        formData.append(key, state[key]);
+      });
 
-            }
-        })
-        
-        //  fetch('../assets/server.php',{
-        //     method:'POST',
-        //     // headers: {'Content-type':'application/json'},
-        //     body: formData
-        // }).then(data =>{
-        //     console.log(data)
-        // }).catch(() =>{
-        //     console.log('error')
-        // })
+      const path = {
+        post: 'assets/server.php',
+        question: 'assets/question.php',
+      };
 
+      const url = currentForm.closest('.popup-design') ? path.question : path.post;
 
-    })
-   } 
-}
+      try {
+        await apiPost(url, formData);
+        statusImage.src = messages.successImg;
+        statusMessage.textContent = messages.success;
+        clearInputForm(currentInputs, currentTextAreas, currentUploads, currentSelects);
+      } catch (error) {
+        console.error(error);
+        statusImage.src = messages.errorImg;
+        statusMessage.textContent = messages.error;
+      } finally {
+        setTimeout(() => {
+          statusImage.remove();
+          statusMessage.remove();
+          currentForm.style.display = 'block';
+          toggleButtonsDisabled(false);
+
+          if (price) {
+            price.textContent = 'Для расчета нужно выбрать размер картины и материал картины';
+          }
+        }, 1500);
+      }
+    });
+  });
+};
+
+export default form;
